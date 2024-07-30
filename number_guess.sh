@@ -26,7 +26,7 @@ while [[ $CORRECT = 0 ]]
 do
   echo "Guess the secret number between 1 and 1000:"
   read guess
-  TRIES=$TRIES + 1
+  TRIES=$(( $TRIES + 1 ))
 
   if [[ ! $guess =~ ^[0-9]+$ ]]
   then
