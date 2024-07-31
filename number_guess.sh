@@ -9,17 +9,13 @@ read name
 if [[ $($PSQL "SELECT name FROM users WHERE name = '$name'") ]]
 then
   # add lookup and output
-  NAME=$(echo $($PSQL "SELECT name FROM users WHERE name = '$name'") | sed -E 's/^ *| *$//g')
-  ID=$($PSQL "SELECT user_id FROM users WHERE name = '$name'")
-  echo $ID
-  GAMES_PLAYED=$($PSQL "SELECT COUNT(user_id) FROM games WHERE user_id = $ID")
-  MIN=$($PSQL "SELECT MIN(guesses) FROM games WHERE user_id = $ID")
-  echo "Welcome back, $NAME! You have played $GAMES_PLAYED games, and your best game took $MIN guesses."
+  username=$(echo $($PSQL "SELECT name FROM users WHERE name = '$name'") | sed -E 's/^ *| *$//g')
+  ID=$(echo $($PSQL "SELECT user_id FROM users WHERE name = '$name'") | sed -E 's/^ *| *$//g')
+  games_played=$(echo $($PSQL "SELECT COUNT(user_id) FROM games WHERE user_id = $ID") | sed -E 's/^ *| *$//g')
+  best_game=$(echo $($PSQL "SELECT MIN(guesses) FROM games WHERE user_id = $ID") | sed -E 's/^ *| *$//g')
+  echo Welcome back, $username! You have played $games_played games, and your best game took $best_game guesses.
 else
   echo "Welcome, $name! It looks like this is  your first time here."
-  INSERT=$($PSQL "INSERT INTO users(name) VALUES('$name')")
-  ID=$($PSQL "SELECT user_id FROM users WHERE name = '$name'")
-  echo $ID
 fi
 
 TRIES=0
@@ -34,11 +30,18 @@ do
   if [[ ! $guess =~ ^[0-9]+$ ]]
   then
     echo "That is not an integer, guess again:"
+    TRIES=$(( $TRIES - 1 ))
   elif [[ $guess = $RND ]]
   then
     echo "You guessed it in $TRIES tries. The secret number was $RND. Nice job!"
     CORRECT=1
+    if [[ ! $($PSQL "SELECT name FROM users WHERE name = '$name'") ]]
+    then
+      INSERT=$($PSQL "INSERT INTO users(name) VALUES('$name')")
+    fi
+    ID=$($PSQL "SELECT user_id FROM users WHERE name = '$name'")
     WIN=$($PSQL "INSERT INTO games(user_id, guesses) VALUES($ID, $TRIES)")
+    
   elif [[ $guess > $RND ]]
   then
     echo "It's lower than that, guess again:"
@@ -46,4 +49,5 @@ do
   then
     echo "It's higher than that, guess again:"
   fi
+  
 done
