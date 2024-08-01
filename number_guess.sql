@@ -136,8 +136,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: freecodecamp
 --
 
-INSERT INTO public.users VALUES (1, 'Nate');
-INSERT INTO public.users VALUES (2, 'Nathan');
 
 
 --
