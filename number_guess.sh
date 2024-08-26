@@ -12,11 +12,15 @@ read name
 if [[ $($PSQL "SELECT name FROM users WHERE name = '$name'") ]]
 then
   # add lookup and output
-  username=$(echo $($PSQL "SELECT name FROM users WHERE name = '$name'") | sed -E 's/^ *| *$//g')
-  ID=$(echo $($PSQL "SELECT user_id FROM users WHERE name = '$name'") | sed -E 's/^ *| *$//g')
-  games_played=$(echo $($PSQL "SELECT COUNT(user_id) FROM games WHERE user_id = $ID") | sed -E 's/^ *| *$//g')
-  best_game=$(echo $($PSQL "SELECT MIN(guesses) FROM games WHERE user_id = $ID") | sed -E 's/^ *| *$//g')
-  echo Welcome back, $username! You have played 1 games, and your best game took 501 guesses.
+  username=$(echo $($PSQL "SELECT name FROM users WHERE name = '$name'"))
+  # | sed -E 's/^ *| *$//g')
+  ID=$(echo $($PSQL "SELECT user_id FROM users WHERE name = '$name'"))
+  # | sed -E 's/^ *| *$//g')
+  games_played=$(echo $($PSQL "SELECT COUNT(user_id) FROM games WHERE user_id = $ID"))
+  # | sed -E 's/^ *| *$//g')
+  best_game=$(echo $($PSQL "SELECT MIN(guesses) FROM games WHERE user_id = $ID"))
+  # | sed -E 's/^ *| *$//g')
+  echo Welcome back, $username! You have played $games_played games, and your best game took 501 guesses.
 else
   echo "Welcome, $name! It looks like this is  your first time here."
 fi
@@ -43,7 +47,8 @@ do
       INSERT=$($PSQL "INSERT INTO users(name) VALUES('$name')")
     fi
     ID=$($PSQL "SELECT user_id FROM users WHERE name = '$name'")
-    WIN=$($PSQL "INSERT INTO games(user_id, guesses, secret, num_games, best) VALUES($ID, $TRIES, $RND, $games_played, $best_game)")
+    #WIN=$($PSQL "INSERT INTO games(user_id, guesses, secret, num_games, best) VALUES($ID, $TRIES, $RND, $games_played, $best_game)")
+    WIN=$($PSQL "INSERT INTO games(user_id, guesses) VALUES($ID, $TRIES)")
     
   elif [[ $guess > $RND ]]
   then
