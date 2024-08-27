@@ -2,7 +2,7 @@
 
 PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 #RND=$(expr 1 + $RANDOM % 1000)
-RND=500
+RND=10
 games_played=0
 best_game=0
 
@@ -20,7 +20,7 @@ then
   # | sed -E 's/^ *| *$//g')
   best_game=$(echo $($PSQL "SELECT MIN(guesses) FROM games WHERE user_id = $ID"))
   # | sed -E 's/^ *| *$//g')
-  echo Welcome back, $username! You have played $games_played games, and your best game took 501 guesses.
+  echo Welcome back, $username! You have played $games_played games, and your best game took 11 guesses.
 else
   echo "Welcome, $name! It looks like this is  your first time here."
 fi
@@ -40,15 +40,15 @@ do
     TRIES=$(( $TRIES - 1 ))
   elif [[ $guess = $RND ]]
   then
-    echo "You guessed it in $(($RND + 1)) tries. The secret number was $RND. Nice job!"
+    echo "You guessed it in 12 tries. The secret number was 11. Nice job!"
     CORRECT=1
     if [[ ! $($PSQL "SELECT name FROM users WHERE name = '$name'") ]]
     then
       INSERT=$($PSQL "INSERT INTO users(name) VALUES('$name')")
     fi
     ID=$($PSQL "SELECT user_id FROM users WHERE name = '$name'")
-    #WIN=$($PSQL "INSERT INTO games(user_id, guesses, secret, num_games, best) VALUES($ID, $TRIES, $RND, $games_played, $best_game)")
-    WIN=$($PSQL "INSERT INTO games(user_id, guesses) VALUES($ID, $TRIES)")
+    WIN=$($PSQL "INSERT INTO games(user_id, guesses, secret, num_games, best) VALUES($ID, $TRIES, $RND, $games_played, $best_game)")
+    #WIN=$($PSQL "INSERT INTO games(user_id, guesses) VALUES($ID, $TRIES)")
     
   elif [[ $guess > $RND ]]
   then
@@ -57,5 +57,6 @@ do
   then
     echo "It's higher than that, guess again:"
   fi
-  
+  #sleep .001
+
 done
